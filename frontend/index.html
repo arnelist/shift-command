@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Manager suite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <div>
+            <span class="topbar-title">Shift Manager suite</span>
+            <span class="topbar-subtitle">Evening shift - Surfshark support</span>
+        </div>
+        <span class="pill">Demo mode - mock data</span>
+    </header>
+
+    <main class="grid">
+        <section class="card sla-card" id="sla-watch">
+            <div class="card-header">
+                <h2>Lowest SLA watch</h2>
+                <span class="muted">Lowest time-to-breach across tickets</span>
+            </div>
+
+            <div class="sla-ticket-id" id="sla-ticket-id">Loading...</div>
+            <div class="sla-countdown" id="sla-countdown">--:--</div>
+            <div class="sla-status" id="sla-status"></div>
+
+            <dl class="details">
+                <div>
+                    <dt>Requester</dt>
+                    <dd id="sla-requester">-</dd>
+                </div>
+
+                <div>
+                    <dt>Status</dt>
+                    <dd id="sla-ticket-status">-</dd>
+                </div>
+
+                <div>
+                    <dt>Subject</dt>
+                    <dd id="sla-subject">-</dd>
+                </div>
+
+                <div>
+                    <dt>Assigned agent</dt>
+                    <dd id="sla-agent">-</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="card" id="performance">
+            <div class="card-header">
+                <h2>Current shift performance</h2>
+                <span class="muted">Target: 8/hr</span>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="perf-efficiency">--%</div>
+                    <div class="stat-label">Shift efficiency</div>
+                    <div class="progress">
+                        <div class="progress-bar" id="perf-efficiency-bar"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="perf-breaches">-</div>
+                    <div class="stat-label">Breaches</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="perf-solved">-</div>
+                    <div class="stat-label">Solved requests</div>
+                </div>  
+            </div>
+
+            <div class="table-scroll">
+                <table class="agent-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="agentName">Agent</th>
+                            <th data-sort="workflowRate">WF</th>
+                            <th data-sort="solvedTickets">Tickets</th>
+                            <th data-sort="solvedChats">Chats</th>
+                            <th data-sort="chatBreaches">Breaches</th>
+                        </tr>
+                    </thead>
+                    <tbody id="perf-agents"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" id="last-shift">
+            <div class="card-header">
+                <h2>Last shift report</h2>
+                <span class="muted" id="last-shift-date">Loading...</span>
+            </div>
+
+            <div class="table-scroll">
+                <table class="agent-table">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Workflow</th>
+                            <th>Chat breaches</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="last-shift-agents"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card" id="monthly">
+            <div class="card-header">
+                <h2>This month's results</h2>
+                <span class="muted" id="monthly-period">Loading...</span>
+            </div>
+
+            <div class="table-scroll">
+                <table class="agent-table">
+                    <thead>
+                        <tr>
+                        <th>Agent</th>
+                            <th>Shifts</th>
+                            <th>WF</th>
+                            <th>CSAT</th>
+                            <th>Resolution</th>
+                            <th>Avg chat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthly-agents"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card scheduler" id="scheduler">
+            <div class="card-header">
+                <h2>Next-Day Scheduler</h2>
+                <span class="muted" id="scheduler-date">Loading...</span>
+            </div>
+
+            <div class="shift-columns">
+                <div class="shift-box">
+                    <h3>Evening shift <span class="muted" id="evening-hours"></span></h3>
+                    <div id="evening-warnings"></div>
+                    <div class="field-label">Shift manager</div>
+                    <ul class="plain-list" id="evening-coverage"></ul>
+                    <div class="field-label">Agents (Workofo availability)</div>
+                    <ul class="plain-list" id="evening-agents"></ul>
+                </div>
+            </div>
+
+            <label class="field-label" for="schedule-text">Slack message (edit before copying)</label>
+            <textarea id="schedule-text" rows="14"></textarea>
+
+            <div class="actions">
+                <button class="btn" id="regenerate-btn">Regenerate</button>
+                <button class="btn btn-primary" id="copy-btn">Copy schedule</button>
+                <span class="muted" id="copy-status"></span>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="breach-dialog">
+        <div class="card-header">
+            <h2 id="breach-dialog-title">Chat breaches</h2>
+            <button class="btn" id="breach-dialog-close">Close</button>
+        </div>
+        <p class="muted">First reply took over 60s. Dispute a breach to send it to the Data team for review.</p>
+
+        <div class="table-scroll">
+            <table class="agent-table">
+                <thead>
+                    <tr>
+                        <th>Chat</th>
+                        <th>Customer</th>
+                        <th>Transferred</th>
+                        <th>First reply</th>
+                        <th>Dispute</th>
+                    </tr>
+                </thead>
+                <tbody id="breach-list"></tbody>
+            </table>
+        </div>
+
+        <form id="dispute-form" hidden>
+            <h3 id="dispute-form-title">Dispute</h3>
+            <label class="field-label" for="dispute-reason">Reason</label>
+            <select id="dispute-reason"></select>
+            <label class="field-label" for="dispute-comment">Comment (optional)</label>
+            <textarea id="dispute-comment" rows="3"></textarea>
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Send to Data team</button>
+                <button type="button" class="btn" id="dispute-cancel">Cancel</button>
+                <span class="muted" id="dispute-status"></span>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="app.js"></script>
+</body>
+</html>
